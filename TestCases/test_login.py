@@ -1,56 +1,62 @@
 import time
+import pytest
 from selenium import webdriver
 from pageObjects.CARTERS.HomePageCarters import HomePageCarters
 from pageObjects.CARTERS.LoginScreen import LoginScreen
-from utilities import readProperties
+from utilities.readProperties import ReadConfig
+from utilities import takeScreenshots
+from utilities.customLogger import LogGenerator
 
 
 class TestLogin:
-    baseUrl = readProperties.read_configuration("basic_info", "baseUrl")
-    username = readProperties.read_configuration("basic_info", "useremail")
-    password = readProperties.read_configuration("basic_info", "password")
+    # Fetching credentials from the configuration
+    username = ReadConfig.get_useremail()
+    password = ReadConfig.get_password()
+
+    # Initialize logger for the test class
+    log = LogGenerator.save_log("Starting the Test Suite")
 
     def test_homepage_title(self, setup_and_teardown):
+        self.log.info("Verifying HomePage Title...")
         self.driver = setup_and_teardown
         act_title = self.driver.title
-        self.driver.close()
-        assert act_title == "[TEST] IA Smart Platform" or act_title == "Impact Smart"
-
-    def test_login(self, setup_and_teardown):
-        self.driver = setup_and_teardown
-        self.lp = LoginScreen(self.driver)
-        time.sleep(3)
-        self.lp.login(self.username, self.password)
-        time.sleep(3)
-        act_title = self.driver.title
-        self.driver.close()
-        if act_title == "[TEST] IA Smart Platform" or "Impact Smart":
+        if act_title == "[TEST] IA Smart Platform" or act_title == "Impact Smart":
+            self.log.info("HomePage title verified successfully.")
             assert True
         else:
+            self.log.error("HomePage title verification failed!")
+            takeScreenshots.capture_screenshot(self.driver, "homepage_title_failure")
             assert False
 
-    def test_home_page(self, setup_and_teardown):
-        failed_assertions = []
+
+    def test_login(self, setup_and_teardown):
+        self.log.info("Filling in login form...")
         self.driver = setup_and_teardown
         self.lp = LoginScreen(self.driver)
-        time.sleep(3)
         self.lp.login(self.username, self.password)
+        time.sleep(3)
+        act_title = self.driver.title
+        if act_title == "[TEST] IA Smart Platform" or act_title == "Impact Smart":
+            self.log.info("Title verified successfully.")
+            assert True
+        else:
+            self.log.error("Title verification failed!")
+            takeScreenshots.capture_screenshot(self.driver, "login_title_failure")
+            assert False
 
+
+    def test_home_page(self, setup_and_teardown):
+        self.log.info("Navigating to home page...")
+        self.driver = setup_and_teardown
+        self.lp = LoginScreen(self.driver)
+        self.lp.login(self.username, self.password)
         self.hm = HomePageCarters(self.driver)
-        time.sleep(5)
-        self.hm.home_page_inventory_smart_selection()
-        self.hm.home_page_get_started()
-        time.sleep(4)
+        time.sleep(3)
         decision_text = self.hm.get_decision_dashboard_text()
-        print(decision_text)
-
-        try:
-            decision_text = self.hm.get_decision_dashboard_text()
-            assert decision_text == "Decision Dashboard"
-        except AssertionError as e:
-            failed_assertions.append(str(e))
-        self.driver.close()
-
-
-
-
+        if decision_text == "Decision Dashboard":
+            self.log.info("Successfully verified the home page content.")
+            assert True
+        else:
+            self.log.error("Home page verification failed!")
+            takeScreenshots.capture_screenshot(self.driver, "home_page_failure")
+            assert False

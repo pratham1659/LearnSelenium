@@ -1,9 +1,12 @@
+from pydoc import browse
+
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-from utilities import readProperties
+# from utilities import readProperties
+from utilities.readProperties import ReadConfig
 
 # Define Chrome options to handle SSL and other configurations
 chrome_options = Options()
@@ -16,8 +19,8 @@ chrome_options.add_argument("--incognito")  # Optionally run in incognito mode
 @pytest.fixture()
 def setup_and_teardown(request):
     # Read the browser type from configuration
-    browser = readProperties.read_configuration("basic_info", "browser")
-
+    # browser = readProperties.read_configuration("basic_info", "browser")
+    browser = ReadConfig.get_browser()
     # Initialize the driver based on the browser choice
     if browser == "chrome":
         # Set Chrome options when initializing the Chrome WebDriver
@@ -32,7 +35,8 @@ def setup_and_teardown(request):
     driver.implicitly_wait(10)
 
     # Open the URL from the configuration
-    web_url = readProperties.read_configuration("basic_info", "baseUrl")
+    # web_url = readProperties.read_configuration
+    web_url = ReadConfig.get_url()
     driver.get(web_url)
 
     # Yield the driver to the test
