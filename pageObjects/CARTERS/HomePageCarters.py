@@ -31,6 +31,7 @@ class HomePageCarters:
     def get_decision_dashboard_text(self):
         """Get the text from the Decision Dashboard"""
         try:
+            time.sleep(3)
             decision_text = self.driver.find_element(*self.dd_title).text
             return decision_text
         except Exception as e:

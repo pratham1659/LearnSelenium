@@ -1,8 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
+
 
 class LoginScreen:
     username_Input = (By.XPATH, "//input[@id='loginInputEmail']")
@@ -12,7 +10,7 @@ class LoginScreen:
     def __init__(self, driver):
         self.driver = driver
 
-    def setUp(self):
+    def set_up(self):
         try:
             # Ensure the driver is set correctly
             if not self.driver:
