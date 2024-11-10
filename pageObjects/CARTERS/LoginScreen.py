@@ -6,6 +6,7 @@ class LoginScreen:
     username_Input = (By.XPATH, "//input[@id='loginInputEmail']")
     password_Input = (By.XPATH, "//input[@id='loginPassword']")
     signin_Button = (By.ID, "btnLogin")
+    logout_Button = (By.XPATH, "(//div[@class='jss466 jss482 jss496 jss403'])[1]")
 
     def __init__(self, driver):
         self.driver = driver
@@ -37,6 +38,13 @@ class LoginScreen:
     def click_login(self):
         try:
             self.driver.find_element(*self.signin_Button).click()
+        except Exception as e:
+            print(f"Error in click_login: {str(e)}")
+            raise
+
+    def click_logout(self):
+        try:
+            self.driver.find_element(*self.logout_Button).click()
         except Exception as e:
             print(f"Error in click_login: {str(e)}")
             raise

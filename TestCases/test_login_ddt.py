@@ -4,6 +4,7 @@ from pandas import read_excel
 from selenium import webdriver
 from pageObjects.CARTERS.HomePageCarters import HomePageCarters
 from pageObjects.CARTERS.LoginScreen import LoginScreen
+from utilities.readExcel import test_data_file
 from utilities.readProperties import ReadConfig
 from utilities import takeScreenshots
 from utilities.customLogger import LogGenerator
@@ -51,28 +52,38 @@ class TestLoginDDT:
             self.expected = readExcel.read_data(self.test_data_file, 'Sheet1', r, 3)
 
             self.lp.login(self.username, self.password)
-
             time.sleep(3)
+
             act_title = self.driver.title
             if act_title == "[TEST] IA Smart Platform" or act_title == "Impact Smart":
                 if self.expected == "pass":
-                    self.log.info("Test Credentials successfully.")
+                    self.log.info("-------------- Passed --------------")
                     list_status.append("Pass")
-                    assert True
                 elif self.expected=="fail":
-                    self.log.info("Test Credential failed")
+                    self.log.info("-------------- Failed --------------")
 
+                    list_status.append("Fail")
 
-            else:
-                self.log.error("Title verification failed!")
-                takeScreenshots.capture_screenshot(self.driver, "login_title_failure")
-                assert False
+            elif act_title != "[TEST] IA Smart Platform" or act_title == "Impact Smart":
+                if self.expected == "pass":
+                    self.log.info("-------------- Failed --------------")
+                    list_status.append("Fail")
+                elif self.expected=="fail":
+                    self.log.info("-------------- Passed --------------")
+                    list_status.append("Pass")
 
+        if "Fail" not in list_status:
+            self.log.info("-----------Login DDT test Passed -----------")
+            self.driver.close()
+            assert True
+        else:
+            self.log.info("-----------Login DDT test Failed -----------")
+            self.driver.close()
+            assert  False
 
-
-
-
-
+        self.log.info("---------------End of Login DDT Test-----------")
+        self.log.info("---------------Complete test_login_DDT---------")
+            # takeScreenshots.capture_screenshot(self.driver, "login_title_failure")
 
 
     def test_home_page(self, setup_and_teardown):
